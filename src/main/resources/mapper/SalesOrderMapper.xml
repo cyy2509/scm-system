@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.scm.mapper.SalesOrderMapper">
+
+    <resultMap id="orderResultMap" type="com.xxx.scm.entity.SalesOrder">
+        <id property="orderId" column="order_id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUserName" column="create_user_name"/>
+    </resultMap>
+
+    <resultMap id="itemResultMap" type="com.xxx.scm.entity.SalesOrderItem">
+        <id property="itemId" column="item_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
+        <result property="amount" column="amount"/>
+        <result property="productName" column="product_name"/>
+    </resultMap>
+
+    <select id="findById" resultMap="orderResultMap">
+        SELECT o.*, u.real_name as create_user_name
+        FROM sales_order o
+        LEFT JOIN sys_user u ON o.create_user = u.user_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="findByPage" resultMap="orderResultMap">
+        SELECT o.*, u.real_name as create_user_name
+        FROM sales_order o
+        LEFT JOIN sys_user u ON o.create_user = u.user_id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+            <if test="createUser != null">
+                AND o.create_user = #{createUser}
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="findCount" resultType="int">
+        SELECT COUNT(*)
+        FROM sales_order o
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+            <if test="createUser != null">
+                AND o.create_user = #{createUser}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO sales_order(order_no, total_amount, create_user)
+        VALUES(#{orderNo}, #{totalAmount}, #{createUser})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM sales_order WHERE order_id = #{orderId}
+    </delete>
+
+    <select id="findOrderItems" resultMap="itemResultMap">
+        SELECT i.*, p.product_name
+        FROM sales_order_item i
+        LEFT JOIN product p ON i.product_id = p.product_id
+        WHERE i.order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrderItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO sales_order_item(order_id, product_id, quantity, price, amount)
+        VALUES(#{orderId}, #{productId}, #{quantity}, #{price}, #{amount})
+    </insert>
+
+    <delete id="deleteOrderItems">
+        DELETE FROM sales_order_item WHERE order_id = #{orderId}
+    </delete>
+
+    <select id="findTodaySales" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(total_amount), 0)
+        FROM sales_order
+        WHERE DATE(create_time) = CURDATE()
+    </select>
+
+    <select id="findSalesTrend7Days" resultType="map">
+        SELECT DATE_FORMAT(create_time, '%m-%d') as date,
+               IFNULL(SUM(total_amount), 0) as amount
+        FROM sales_order
+        WHERE create_time &gt;= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d'), DATE_FORMAT(create_time, '%m-%d')
+        ORDER BY DATE_FORMAT(create_time, '%Y-%m-%d')
+    </select>
+
+    <select id="findSalesTrend30Days" resultType="map">
+        SELECT DATE_FORMAT(create_time, '%m-%d') as date,
+               IFNULL(SUM(total_amount), 0) as amount
+        FROM sales_order
+        WHERE create_time &gt;= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d'), DATE_FORMAT(create_time, '%m-%d')
+        ORDER BY DATE_FORMAT(create_time, '%Y-%m-%d')
+    </select>
+
+    <select id="findRecentOrders" resultMap="orderResultMap">
+        SELECT o.*, u.real_name as create_user_name
+        FROM sales_order o
+        LEFT JOIN sys_user u ON o.create_user = u.user_id
+        ORDER BY o.create_time DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.scm.mapper.SupplierMapper">
+
+    <resultMap id="supplierResultMap" type="com.xxx.scm.entity.Supplier">
+        <id property="supplierId" column="supplier_id"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="contact" column="contact"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findById" resultMap="supplierResultMap">
+        SELECT * FROM supplier WHERE supplier_id = #{supplierId}
+    </select>
+
+    <select id="findByPage" resultMap="supplierResultMap">
+        SELECT * FROM supplier
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND supplier_name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="contact != null and contact != ''">
+                AND contact LIKE CONCAT('%', #{contact}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="findCount" resultType="int">
+        SELECT COUNT(*) FROM supplier
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND supplier_name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="contact != null and contact != ''">
+                AND contact LIKE CONCAT('%', #{contact}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findAll" resultMap="supplierResultMap">
+        SELECT * FROM supplier ORDER BY supplier_name
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="supplierId">
+        INSERT INTO supplier(supplier_name, contact, phone, address, remark)
+        VALUES(#{supplierName}, #{contact}, #{phone}, #{address}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE supplier
+        SET supplier_name = #{supplierName},
+            contact = #{contact},
+            phone = #{phone},
+            address = #{address},
+            remark = #{remark}
+        WHERE supplier_id = #{supplierId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM supplier WHERE supplier_id = #{supplierId}
+    </delete>
+
+    <select id="countPurchaseOrders" resultType="int">
+        SELECT COUNT(*) FROM purchase_order WHERE supplier_id = #{supplierId}
+    </select>
+
+    <!-- 统计本月新增供应商 -->
+    <select id="countNewSuppliersThisMonth" resultType="int">
+        SELECT COUNT(*) FROM supplier
+        WHERE YEAR(create_time) = YEAR(CURDATE())
+        AND MONTH(create_time) = MONTH(CURDATE())
+    </select>
+</mapper>
+

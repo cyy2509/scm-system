@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.scm.mapper.SysOperationLogMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="logId">
+        INSERT INTO sys_operation_log(user_id, username, operation, module, method, ip)
+        VALUES(#{userId}, #{username}, #{operation}, #{module}, #{method}, #{ip})
+    </insert>
+
+    <select id="findByPage" resultType="com.xxx.scm.entity.SysOperationLog">
+        SELECT * FROM sys_operation_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                     OR operation LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="module != null and module != ''">
+                AND module = #{module}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="findCount" resultType="int">
+        SELECT COUNT(*) FROM sys_operation_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                     OR operation LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="module != null and module != ''">
+                AND module = #{module}
+            </if>
+        </where>
+    </select>
+</mapper>

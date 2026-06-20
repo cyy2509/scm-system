@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxx.scm.mapper.PurchaseOrderMapper">
+
+    <resultMap id="orderResultMap" type="com.xxx.scm.entity.PurchaseOrder">
+        <id property="orderId" column="order_id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="supplierId" column="supplier_id"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="createUserName" column="create_user_name"/>
+    </resultMap>
+
+    <resultMap id="itemResultMap" type="com.xxx.scm.entity.PurchaseOrderItem">
+        <id property="itemId" column="item_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
+        <result property="amount" column="amount"/>
+        <result property="productName" column="product_name"/>
+    </resultMap>
+
+    <select id="findById" resultMap="orderResultMap">
+        SELECT o.*, s.supplier_name, u.real_name as create_user_name
+        FROM purchase_order o
+        LEFT JOIN supplier s ON o.supplier_id = s.supplier_id
+        LEFT JOIN sys_user u ON o.create_user = u.user_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="findByPage" resultMap="orderResultMap">
+        SELECT o.*, s.supplier_name, u.real_name as create_user_name
+        FROM purchase_order o
+        LEFT JOIN supplier s ON o.supplier_id = s.supplier_id
+        LEFT JOIN sys_user u ON o.create_user = u.user_id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="supplierId != null">
+                AND o.supplier_id = #{supplierId}
+            </if>
+            <if test="status != null">
+                AND o.order_status = #{status}
+            </if>
+            <if test="createUser != null">
+                AND o.create_user = #{createUser}
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="findCount" resultType="int">
+        SELECT COUNT(*)
+        FROM purchase_order o
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="supplierId != null">
+                AND o.supplier_id = #{supplierId}
+            </if>
+            <if test="status != null">
+                AND o.order_status = #{status}
+            </if>
+            <if test="createUser != null">
+                AND o.create_user = #{createUser}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO purchase_order(order_no, supplier_id, total_amount, order_status, create_user)
+        VALUES(#{orderNo}, #{supplierId}, #{totalAmount}, #{orderStatus}, #{createUser})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE purchase_order SET order_status = #{status} WHERE order_id = #{orderId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM purchase_order WHERE order_id = #{orderId}
+    </delete>
+
+    <select id="findOrderItems" resultMap="itemResultMap">
+        SELECT i.*, p.product_name
+        FROM purchase_order_item i
+        LEFT JOIN product p ON i.product_id = p.product_id
+        WHERE i.order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrderItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO purchase_order_item(order_id, product_id, quantity, price, amount)
+        VALUES(#{orderId}, #{productId}, #{quantity}, #{price}, #{amount})
+    </insert>
+
+    <delete id="deleteOrderItems">
+        DELETE FROM purchase_order_item WHERE order_id = #{orderId}
+    </delete>
+
+    <select id="findMonthlyPurchaseAmount" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(total_amount), 0)
+        FROM purchase_order
+        WHERE order_status = 1
+        AND YEAR(create_time) = YEAR(CURDATE())
+        AND MONTH(create_time) = MONTH(CURDATE())
+    </select>
+
+    <select id="findSupplierTop5" resultType="map">
+        SELECT s.supplier_name as name, SUM(o.total_amount) as value
+        FROM purchase_order o
+        JOIN supplier s ON o.supplier_id = s.supplier_id
+        WHERE o.order_status = 1
+        GROUP BY o.supplier_id, s.supplier_name
+        ORDER BY value DESC
+        LIMIT 5
+    </select>
+</mapper>
