@@ -602,6 +602,135 @@ html, body {
 }
 .chart-container { height: 300px; min-height: 200px; }
 
+/* === KPI 统计卡片 === */
+.stat-card {
+  position: relative; background: var(--color-surface);
+  border-radius: var(--radius-lg); border: 1px solid var(--color-hairline);
+  box-shadow: var(--shadow-card); overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(35,87,198,0.12);
+  border-color: #CBD5E1;
+}
+.stat-card-top-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.stat-card--sales .stat-card-top-bar { background: linear-gradient(90deg, #1E40AF, #3B82F6); }
+.stat-card--purchase .stat-card-top-bar { background: linear-gradient(90deg, #1D4ED8, #60A5FA); }
+.stat-card--stock .stat-card-top-bar { background: linear-gradient(90deg, #2563EB, #93C5FD); }
+.stat-card--supplier .stat-card-top-bar { background: linear-gradient(90deg, #1E3A8A, #BFDBFE); }
+
+.stat-card-body {
+  display: flex; align-items: center; gap: 16px; padding: 20px 20px 16px; padding-top: 24px;
+}
+.stat-card-icon-box {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.stat-card-info { flex: 1; min-width: 0; }
+.stat-card-label {
+  font-size: 13px; font-weight: 500; color: var(--color-ink-muted);
+  margin-bottom: 6px; letter-spacing: 0.01em;
+}
+.stat-card-value { margin-bottom: 4px; }
+.stat-card-number {
+  font-size: 28px; font-weight: 700; color: var(--color-ink);
+  letter-spacing: -0.02em; line-height: 1.2;
+}
+.stat-card-number.num-zero { color: var(--color-ink-subtle); font-weight: 600; }
+.stat-card-prefix { font-size: 16px; font-weight: 500; color: var(--color-ink-muted); margin-right: 2px; }
+.stat-card-suffix { font-size: 14px; font-weight: 400; color: var(--color-ink-muted); margin-left: 4px; }
+
+/* 环比趋势 */
+.stat-card-trend {
+  display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600;
+}
+.trend-up { color: #059669; }
+.trend-down { color: #DC2626; }
+.trend-arrow { font-size: 10px; }
+.trend-label { font-weight: 400; color: var(--color-ink-subtle); }
+
+/* 零值引导 */
+.stat-card-zero { margin-top: 2px; }
+.stat-card-zero p { font-size: 12px; color: var(--color-ink-subtle); margin: 0 0 4px 0; }
+.stat-card-zero a { font-size: 12px; color: var(--color-primary); text-decoration: none; font-weight: 500; }
+.stat-card-zero a:hover { text-decoration: underline; }
+.stat-card--zero .stat-card-icon-box { opacity: 0.6; }
+
+/* 图表行 */
+.chart-box-header { display: flex; justify-content: space-between; align-items: center; }
+.chart-box-header h4 { margin-bottom: var(--space-md); font-size: 14px; font-weight: 600; color: var(--color-ink-secondary); letter-spacing: -0.01em; }
+.chart-box-header .chart-link { font-size: 12px; color: var(--color-primary); text-decoration: none; }
+.chart-box-header .chart-link:hover { text-decoration: underline; }
+
+/* 库存表格 */
+.stock-table-wrap { max-height: 260px; overflow-y: auto; }
+.stock-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--color-hairline);
+}
+.stock-row:last-child { border-bottom: none; }
+.stock-name { font-size: 13px; color: var(--color-ink-secondary); display: flex; align-items: center; gap: 8px; flex: 1; }
+.stock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stock-dot.danger { background: #DC2626; }
+.stock-dot.warning { background: #D97706; }
+.stock-dot.safe { background: #059669; }
+.stock-bar-wrap { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+.stock-bar-track { width: 120px; height: 6px; background: #E4E7ED; border-radius: 3px; overflow: hidden; }
+.stock-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.stock-bar-fill.danger { background: #DC2626; }
+.stock-bar-fill.warning { background: #D97706; }
+.stock-bar-fill.safe { background: #059669; }
+.stock-nums { font-size: 12px; color: var(--color-ink-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stock-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+}
+.stock-empty-title { font-size: 15px; font-weight: 600; color: var(--color-ink-muted); margin: 12px 0 4px; }
+.stock-empty-desc { font-size: 13px; color: var(--color-ink-subtle); margin: 0 0 12px; }
+
+/* 最近订单 */
+.recent-orders-wrap { max-height: 260px; overflow-y: auto; }
+.order-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--color-hairline);
+}
+.order-row:last-child { border-bottom: none; }
+.order-left { display: flex; flex-direction: column; gap: 2px; }
+.order-no { font-size: 13px; font-weight: 600; color: var(--color-ink); }
+.order-user { font-size: 12px; color: var(--color-ink-subtle); }
+.order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.order-amount { font-size: 14px; font-weight: 700; color: var(--color-primary); }
+.order-time { font-size: 11px; color: var(--color-ink-subtle); }
+
+/* 本月概况 */
+.month-summary { display: flex; justify-content: space-around; padding: 20px 0; }
+.summary-item { text-align: center; }
+.summary-value { font-size: 24px; font-weight: 700; color: var(--color-ink); margin-bottom: 4px; }
+.summary-value.highlight { color: var(--color-primary); }
+.summary-label { font-size: 12px; color: var(--color-ink-subtle); }
+
+/* 暗黑模式 — 统计卡片 */
+.dark .stat-card { background: var(--color-sidebar-surface); border-color: rgba(255,255,255,0.06); }
+.dark .stat-card-label { color: #94A3B8; }
+.dark .stat-card-number { color: #E2E8F0; }
+.dark .stat-card-number.num-zero { color: #64748B; }
+.dark .stat-card-zero p { color: #64748B; }
+.dark .chart-box { background: var(--color-sidebar-surface); border-color: rgba(255,255,255,0.06); }
+.dark .chart-box h4 { color: #CBD5E1; }
+.dark .stock-row { border-bottom-color: rgba(255,255,255,0.06); }
+.dark .stock-name { color: #CBD5E1; }
+.dark .stock-bar-track { background: #334155; }
+.dark .stock-empty-title { color: #94A3B8; }
+.dark .stock-empty-desc { color: #64748B; }
+.dark .order-row { border-bottom-color: rgba(255,255,255,0.06); }
+.dark .order-no { color: #E2E8F0; }
+.dark .summary-value { color: #E2E8F0; }
+.dark .month-summary .summary-label { color: #64748B; }
+
 /* ===========================================
    页面卡片 & 搜索栏
    =========================================== */
