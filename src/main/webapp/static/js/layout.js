@@ -1,16 +1,21 @@
 /**
- * 主布局组件
+ * 主布局组件 — v3.0 深色侧边栏
  */
 const LayoutPage = {
     template: '\
     <div class="layout">\
         <div class="layout-sidebar">\
-            <div class="logo">百货中心 SCM</div>\
+            <div class="logo">\
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:10px;flex-shrink:0">\
+                    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>\
+                </svg>\
+                百货中心 SCM\
+            </div>\
             <el-menu\
                 :default-active="activeMenu"\
                 :router="true"\
-                background-color="#304156"\
-                text-color="#bfcbd9"\
+                background-color="transparent"\
+                text-color="rgba(255,255,255,0.6)"\
                 active-text-color="#fff">\
                 <el-menu-item index="/dashboard">\
                     <el-icon><component is="Odometer"/></el-icon>\
@@ -52,10 +57,34 @@ const LayoutPage = {
         </div>\
         <div class="layout-main">\
             <div class="layout-header">\
-                <span style="font-size: 16px; color: #303133;">{{ currentTitle }}</span>\
-                <div style="display: flex; align-items: center; gap: 15px;">\
-                    <span style="color: #606266;">{{ userInfo.realName }}（{{ userInfo.roleName }}）</span>\
-                    <el-button type="danger" size="small" @click="handleLogout">退出</el-button>\
+                <div class="header-left">\
+                    <span class="page-title">{{ currentTitle }}</span>\
+                    <el-breadcrumb separator="/" class="header-breadcrumb">\
+                        <el-breadcrumb-item>首页</el-breadcrumb-item>\
+                        <el-breadcrumb-item v-if="parentMenu">{{ parentMenu }}</el-breadcrumb-item>\
+                        <el-breadcrumb-item>{{ currentTitle }}</el-breadcrumb-item>\
+                    </el-breadcrumb>\
+                </div>\
+                <div class="user-area">\
+                    <button class="dark-toggle" @click="toggleDark" :title="isDark ? \'切至浅色模式\' : \'切至深色模式\'">\
+                        <span v-if="isDark">☀️</span>\
+                        <span v-else>🌙</span>\
+                    </button>\
+                    <el-dropdown trigger="click">\
+                        <span class="user-name">\
+                            <el-icon style="margin-right:6px"><component is="User"/></el-icon>\
+                            {{ userInfo.realName }}（{{ userInfo.roleName }}）\
+                            <el-icon style="margin-left:4px"><component is="ArrowDown"/></el-icon>\
+                        </span>\
+                        <template #dropdown>\
+                            <el-dropdown-menu>\
+                                <el-dropdown-item disabled>{{ userInfo.username }}</el-dropdown-item>\
+                                <el-dropdown-item divided @click="handleLogout">\
+                                    <span style="color:#F56C6C">退出登录</span>\
+                                </el-dropdown-item>\
+                            </el-dropdown-menu>\
+                        </template>\
+                    </el-dropdown>\
                 </div>\
             </div>\
             <div class="layout-content">\
@@ -66,6 +95,7 @@ const LayoutPage = {
     data: function() {
         return {
             userInfo: {},
+            isDark: document.documentElement.classList.contains('dark'),
             rolePermissions: {
                 '经理': ['user','role','supplier','product','purchase','sales','news','log','dashboard'],
                 '采购部员工': ['supplier','purchase','dashboard'],
@@ -78,17 +108,21 @@ const LayoutPage = {
     computed: {
         activeMenu: function() {
             var path = this.$route.path;
-            if (path.match(/^\/(purchase|sales)\/\d+$/)) {
-                return path.substring(0, path.lastIndexOf('/'));
-            }
-            if (path.match(/^\/(purchase|sales)\/add$/)) {
-                return path.substring(0, path.lastIndexOf('/'));
-            }
+            var m = path.match(/^\/(purchase|sales)\/\d+$/);
+            if (m) return '/' + m[1];
+            if (path.match(/^\/(purchase|sales)\/add$/)) return path.substring(0, path.lastIndexOf('/'));
             return path;
         },
         currentTitle: function() {
             var meta = this.$route.meta;
             return meta ? meta.title || '' : '';
+        },
+        parentMenu: function() {
+            var path = this.$route.path;
+            // 采购/销售子页面
+            if (path.indexOf('/purchase/') === 0) return '采购订单';
+            if (path.indexOf('/sales/') === 0) return '销售订单';
+            return '';
         }
     },
     created: function() {
@@ -96,8 +130,26 @@ const LayoutPage = {
         if (info) {
             try { this.userInfo = JSON.parse(info); } catch(e) {}
         }
+        // 读取用户暗黑模式偏好
+        var savedDark = localStorage.getItem('darkMode');
+        if (savedDark === 'true') {
+            this.isDark = true;
+            document.documentElement.classList.add('dark');
+        }
     },
     methods: {
+        toggleDark: function() {
+            this.isDark = !this.isDark;
+            if (this.isDark) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('darkMode', 'false');
+            }
+            // 通知所有页面主题变更
+            window.dispatchEvent(new CustomEvent('themechange', { detail: { dark: this.isDark } }));
+        },
         hasPerm: function(module) {
             var roleName = this.userInfo.roleName;
             if (!roleName) return false;

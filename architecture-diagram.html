@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百货中心供应链管理系统 - 系统架构图</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      padding: 30px;
+      color: white;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* ===== 顶部全局组件栏 ===== */
+    .top-bar {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 15px;
+      border: 2px solid #16213e;
+    }
+    .top-bar .item {
+      background: #16213e;
+      border: 1px solid #e94560;
+      border-radius: 6px;
+      padding: 10px 20px;
+      text-align: center;
+      min-width: 200px;
+    }
+    .top-bar .item .title { font-size: 14px; font-weight: bold; color: #e94560; }
+    .top-bar .item .desc { font-size: 11px; color: #a0a0b0; margin-top: 4px; }
+
+    /* ===== 主体区域 ===== */
+    .main-area {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* 左侧说明栏 */
+    .left-sidebar {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 15px;
+      width: 140px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid #16213e;
+    }
+    .left-sidebar .vert-title {
+      writing-mode: vertical-rl;
+      font-size: 18px;
+      font-weight: bold;
+      color: #53d8fb;
+      letter-spacing: 8px;
+      margin-bottom: 15px;
+    }
+    .left-sidebar .note-box {
+      background: white;
+      border-radius: 6px;
+      padding: 12px 10px;
+      color: #333;
+      font-size: 11px;
+      line-height: 1.8;
+      width: 100%;
+    }
+    .left-sidebar .note-box .highlight { color: #e94560; font-weight: bold; }
+
+    /* 中间5层 */
+    .center-layers {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .layer {
+      background: #e94560;
+      border-radius: 8px;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-height: 60px;
+    }
+    .layer:nth-child(1) { background: linear-gradient(135deg, #e94560, #c23152); }
+    .layer:nth-child(2) { background: linear-gradient(135deg, #e94560, #d63851); }
+    .layer:nth-child(3) { background: linear-gradient(135deg, #e94560, #bf2d48); }
+    .layer:nth-child(4) { background: linear-gradient(135deg, #e94560, #a8253e); }
+    .layer:nth-child(5) { background: linear-gradient(135deg, #e94560, #911d34); }
+
+    .layer-num {
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+      min-width: 140px;
+    }
+    .layer-tech {
+      background: rgba(255,255,255,0.2);
+      border-radius: 6px;
+      padding: 8px 15px;
+      font-size: 12px;
+      color: #fff;
+      min-width: 180px;
+      text-align: center;
+    }
+    .layer-tech .label { color: #ffd700; font-weight: bold; }
+    .layer-resp {
+      font-size: 12px;
+      color: #fff;
+      flex: 1;
+    }
+    .layer-resp .label { color: #ffd700; font-weight: bold; }
+
+    .arrow-down {
+      text-align: center;
+      color: #53d8fb;
+      font-size: 20px;
+      margin: -2px 0;
+    }
+
+    /* 右侧技术栈 */
+    .right-sidebar {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 15px;
+      width: 160px;
+      flex-shrink: 0;
+      border: 2px solid #16213e;
+    }
+    .right-sidebar .title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #53d8fb;
+      text-align: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #16213e;
+      padding-bottom: 8px;
+    }
+    .right-sidebar .tech-item {
+      background: white;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .right-sidebar .tech-item .name { font-size: 13px; font-weight: bold; color: #333; }
+    .right-sidebar .tech-item .ver { font-size: 10px; color: #888; margin-top: 2px; }
+
+    /* ===== 底部说明 ===== */
+    .bottom-note {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 11px;
+      color: #a0a0b0;
+      border: 2px solid #16213e;
+    }
+    .bottom-note span { color: #53d8fb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部：全局支撑组件 -->
+    <div class="top-bar">
+      <div class="item">
+        <div class="title">全局支撑组件（贯穿各层）</div>
+        <div class="desc">拦截器 · AOP切面 · 异常处理</div>
+      </div>
+      <div class="item">
+        <div class="title">POJO 实体类（数据载体）</div>
+        <div class="desc">entity 包下 11 个实体类</div>
+      </div>
+      <div class="item">
+        <div class="title">核心配置（Spring/MyBatis XML）</div>
+        <div class="desc">applicationContext.xml · springmvc-config.xml</div>
+      </div>
+    </div>
+
+    <!-- 主体区域 -->
+    <div class="main-area">
+      <!-- 左侧说明 -->
+      <div class="left-sidebar">
+        <div class="vert-title">架构说明</div>
+        <div class="note-box">
+          <strong>架构层级</strong><br>
+          （自上而下）<br><br>
+          <span class="highlight">单向调用依赖</span><br>
+          上层可调用下层<br>
+          下层不可调用上层
+        </div>
+      </div>
+
+      <!-- 中间5层 -->
+      <div class="center-layers">
+        <!-- 第1层：表现层 -->
+        <div class="layer">
+          <div class="layer-num">1. 表现层<br>(View Layer)</div>
+          <div class="layer-tech">
+            <span class="label">核心技术：</span><br>
+            JSP + Bootstrap 4 + jQuery 3.6 + ECharts 5.4
+          </div>
+          <div class="layer-resp">
+            <span class="label">职责：</span>展示界面，用户交互<br>
+            <span style="font-size:10px;color:#ffd700;">34个JSP页面 · 10个JS模块 · CDN引入前端资源</span>
+          </div>
+        </div>
+
+        <div class="arrow-down">▼</div>
+
+        <!-- 第2层：控制层 -->
+        <div class="layer">
+          <div class="layer-num">2. 控制层<br>(Controller Layer)</div>
+          <div class="layer-tech">
+            <span class="label">核心技术：</span><br>
+            Spring MVC 5.3.20
+          </div>
+          <div class="layer-resp">
+            <span class="label">职责：</span>接收请求，路由分发<br>
+            <span style="font-size:10px;color:#ffd700;">12个Controller · @Controller注解 · 拦截器(JWT+权限)</span>
+          </div>
+        </div>
+
+        <div class="arrow-down">▼</div>
+
+        <!-- 第3层：业务逻辑层 -->
+        <div class="layer">
+          <div class="layer-num">3. 业务逻辑层<br>(Service Layer)</div>
+          <div class="layer-tech">
+            <span class="label">核心技术：</span><br>
+            Spring 5.3.20 (@Service)
+          </div>
+          <div class="layer-resp">
+            <span class="label">职责：</span>处理核心业务逻辑<br>
+            <span style="font-size:10px;color:#ffd700;">8个Service · 事务管理 · 库存联动 · AOP日志切面</span>
+          </div>
+        </div>
+
+        <div class="arrow-down">▼</div>
+
+        <!-- 第4层：数据访问层 -->
+        <div class="layer">
+          <div class="layer-num">4. 数据访问层<br>(DAO Layer)</div>
+          <div class="layer-tech">
+            <span class="label">核心技术：</span><br>
+            MyBatis 3.5.10
+          </div>
+          <div class="layer-resp">
+            <span class="label">职责：</span>执行SQL，数据访问<br>
+            <span style="font-size:10px;color:#ffd700;">9个Mapper接口 · 9个XML映射 · 驼峰自动映射</span>
+          </div>
+        </div>
+
+        <div class="arrow-down">▼</div>
+
+        <!-- 第5层：数据库层 -->
+        <div class="layer">
+          <div class="layer-num">5. 数据库层<br>(Database Layer)</div>
+          <div class="layer-tech">
+            <span class="label">核心技术：</span><br>
+            MySQL 8.0.30
+          </div>
+          <div class="layer-resp">
+            <span class="label">职责：</span>数据持久化存储<br>
+            <span style="font-size:10px;color:#ffd700;">scm_db · 11张表 · Druid连接池 · 外键约束</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧技术栈 -->
+      <div class="right-sidebar">
+        <div class="title">技术栈</div>
+        <div class="tech-item">
+          <div class="name">Spring Framework</div>
+          <div class="ver">5.3.20</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Spring MVC</div>
+          <div class="ver">5.3.20</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">MyBatis</div>
+          <div class="ver">3.5.10</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">MySQL</div>
+          <div class="ver">8.0.30</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Druid</div>
+          <div class="ver">1.2.11</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">JWT</div>
+          <div class="ver">0.11.5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部说明 -->
+    <div class="bottom-note">
+      <div>表现层: <span>JSP · Bootstrap · jQuery · ECharts</span></div>
+      <div>控制层: <span>@Controller · 拦截器 · 文件上传</span></div>
+      <div>业务层: <span>@Service · @Transactional · AOP</span></div>
+      <div>持久层: <span>@Mapper · Mapper XML · Druid</span></div>
+    </div>
+  </div>
+</body>
+</html>

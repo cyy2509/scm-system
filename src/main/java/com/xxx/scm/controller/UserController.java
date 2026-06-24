@@ -6,9 +6,11 @@ import com.xxx.scm.service.SysRoleService;
 import com.xxx.scm.service.SysUserService;
 import com.xxx.scm.util.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +62,7 @@ public class UserController {
      * 添加用户
      */
     @PostMapping("/add")
-    public R<?> add(@RequestBody SysUser user) {
+    public R<?> add(@Valid @RequestBody SysUser user) {
         try {
             userService.add(user);
             return R.ok("添加成功");
@@ -73,7 +75,7 @@ public class UserController {
      * 修改用户
      */
     @PostMapping("/update")
-    public R<?> update(@RequestBody SysUser user) {
+    public R<?> update(@Valid @RequestBody SysUser user) {
         try {
             userService.update(user);
             return R.ok("修改成功");

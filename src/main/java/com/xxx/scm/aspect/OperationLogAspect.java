@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * 操作日志AOP切面
@@ -39,9 +38,9 @@ public class OperationLogAspect {
     @AfterReturning(pointcut = "operationPointcut()", returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
         try {
-            // 获取当前登录用户
-            HttpSession session = request.getSession();
-            SysUser user = (SysUser) session.getAttribute("loginUser");
+            // 从LoginInterceptor设置的request属性中获取当前登录用户
+            Object userIdObj = request.getAttribute("userId");
+            String username = (String) request.getAttribute("username");
 
             // 获取方法名和模块名
             String methodName = joinPoint.getSignature().getName();
@@ -63,9 +62,9 @@ public class OperationLogAspect {
 
             // 保存日志
             SysOperationLog log = new SysOperationLog();
-            if (user != null) {
-                log.setUserId(user.getUserId());
-                log.setUsername(user.getUsername());
+            if (userIdObj != null) {
+                log.setUserId((Integer) userIdObj);
+                log.setUsername(username);
             }
             log.setOperation(operation);
             log.setModule(module);

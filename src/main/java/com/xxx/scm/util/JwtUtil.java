@@ -6,17 +6,36 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import java.io.InputStream;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * JWT 工具类
  */
 public class JwtUtil {
 
-    // 密钥（至少 256 位）
-    private static final SecretKey KEY = Keys.hmacShaKeyFor("scm-system-jwt-secret-key-2024-very-long-string".getBytes());
+    // 从配置文件加载密钥，避免硬编码
+    private static final SecretKey KEY;
     // 过期时间：24 小时
     private static final long EXPIRE = 24 * 60 * 60 * 1000;
+
+    static {
+        String secret = "scm-system-default-secret-change-me";
+        try (InputStream in = JwtUtil.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (in != null) {
+                Properties props = new Properties();
+                props.load(in);
+                String configured = props.getProperty("jwt.secret");
+                if (configured != null && !configured.isEmpty()) {
+                    secret = configured;
+                }
+            }
+        } catch (Exception ignored) {
+            // 使用默认值
+        }
+        KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     /**
      * 生成 JWT token

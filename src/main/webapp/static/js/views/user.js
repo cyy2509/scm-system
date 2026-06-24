@@ -10,12 +10,13 @@ const UserPage = {
         </div>\
         <div class="search-bar">\
             <el-input v-model="query.keyword" placeholder="搜索用户名/姓名" clearable style="width:200px" @clear="loadData" @keyup.enter="loadData"></el-input>\
-            <el-select v-model="query.roleId" placeholder="选择角色" clearable style="width:150px" @change="loadData">\
+            <el-select v-model="query.roleId" placeholder="选择角色" clearable style="width:160px" @change="loadData">\
                 <el-option v-for="r in roles" :key="r.roleId" :label="r.roleName" :value="r.roleId"></el-option>\
             </el-select>\
             <el-button type="primary" @click="loadData">搜索</el-button>\
+            <el-button @click="resetQuery">重置</el-button>\
         </div>\
-        <el-table :data="page.list" v-loading="loading" border stripe>\
+        <el-table :data="page.list" v-loading="loading" border stripe empty-text="暂无数据">\
             <el-table-column prop="userId" label="ID" width="60"></el-table-column>\
             <el-table-column prop="username" label="用户名" width="120"></el-table-column>\
             <el-table-column prop="realName" label="姓名" width="100"></el-table-column>\
@@ -36,8 +37,9 @@ const UserPage = {
                 </template>\
             </el-table-column>\
         </el-table>\
-        <div style="margin-top:15px;display:flex;justify-content:flex-end">\
-            <el-pagination background layout="total, prev, pager, next" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
+        <div class="pagination-bar">\
+            <span class="pagination-total">共 {{ page.totalCount }} 条记录</span>\
+            <el-pagination background layout="total, sizes, prev, pager, next" :page-sizes="[10,20,50]" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData" @size-change="onPageSizeChange"></el-pagination>\
         </div>\
         <!-- 新增/编辑弹窗 -->\
         <el-dialog v-model="dialogVisible" :title="isEdit?\'编辑用户\':\'新增用户\'" width="500px">\
@@ -88,6 +90,15 @@ const UserPage = {
     },
     created: function() { this.loadRoles(); this.loadData(); },
     methods: {
+        resetQuery: function() {
+            this.query = { pageNo: 1, pageSize: this.query.pageSize, keyword: '', roleId: null };
+            this.loadData();
+        },
+        onPageSizeChange: function(size) {
+            this.query.pageSize = size;
+            this.query.pageNo = 1;
+            this.loadData();
+        },
         loadRoles: function() {
             var self = this;
             api.getUserRoles().then(function(res) { if (res.code === 200) self.roles = res.data; });

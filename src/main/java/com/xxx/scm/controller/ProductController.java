@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -113,16 +116,31 @@ public class ProductController {
         return R.ok(productService.findAll());
     }
 
+    // 允许的图片文件类型
+    private static final Set<String> ALLOWED_IMAGE_TYPES = new HashSet<>(Arrays.asList(
+        ".jpg", ".jpeg", ".png", ".gif", ".webp"
+    ));
+
     /**
-     * 图片上传
+     * 图片上传（带文件类型校验）
      */
     private String uploadImage(MultipartFile file, HttpServletRequest request) throws IOException {
+        // 校验原始文件名
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            throw new IOException("无效的图片文件");
+        }
+
+        // 校验文件类型白名单
+        String ext = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_IMAGE_TYPES.contains(ext)) {
+            throw new IOException("不支持的文件类型，仅允许 " + String.join(", ", ALLOWED_IMAGE_TYPES));
+        }
+
         String uploadDir = request.getServletContext().getRealPath("/static/images/products/");
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
 
-        String originalFilename = file.getOriginalFilename();
-        String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
         String newFilename = UUID.randomUUID().toString() + ext;
         file.transferTo(new File(uploadDir + newFilename));
         return "/static/images/products/" + newFilename;

@@ -8,7 +8,7 @@ const RolePage = {
             <h3>角色管理</h3>\
             <el-button type="primary" @click="showAdd">新增角色</el-button>\
         </div>\
-        <el-table :data="page.list" v-loading="loading" border stripe>\
+        <el-table :data="page.list" v-loading="loading" border stripe empty-text="暂无数据">\
             <el-table-column prop="roleId" label="ID" width="60"></el-table-column>\
             <el-table-column prop="roleName" label="角色名称" width="150"></el-table-column>\
             <el-table-column prop="roleDesc" label="描述"></el-table-column>\
@@ -21,8 +21,9 @@ const RolePage = {
                 </template>\
             </el-table-column>\
         </el-table>\
-        <div style="margin-top:15px;display:flex;justify-content:flex-end">\
-            <el-pagination background layout="total, prev, pager, next" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
+        <div class="pagination-bar">\
+            <span class="pagination-total">共 {{ page.totalCount }} 条记录</span>\
+            <el-pagination background layout="total, sizes, prev, pager, next" :page-sizes="[10,20,50]" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
         </div>\
         <el-dialog v-model="dialogVisible" :title="isEdit?\'编辑角色\':\'新增角色\'" width="400px">\
             <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">\

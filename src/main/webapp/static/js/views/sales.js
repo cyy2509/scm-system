@@ -9,15 +9,16 @@ const SalesPage = {
             <el-button type="primary" @click="$router.push(\'/sales/add\')">新增销售</el-button>\
         </div>\
         <div class="search-bar">\
-            <el-input v-model="query.orderNo" placeholder="订单号" clearable style="width:180px" @clear="loadData" @keyup.enter="loadData"></el-input>\
+            <el-input v-model="query.orderNo" placeholder="订单号" clearable style="width:200px" @clear="loadData" @keyup.enter="loadData"></el-input>\
             <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="YYYY-MM-DD" style="width:280px" @change="onDateChange"></el-date-picker>\
             <el-button type="primary" @click="loadData">搜索</el-button>\
+            <el-button @click="resetQuery">重置</el-button>\
         </div>\
-        <el-table :data="page.list" v-loading="loading" border stripe>\
+        <el-table :data="page.list" v-loading="loading" border stripe empty-text="暂无数据">\
             <el-table-column prop="orderNo" label="订单号" width="180"></el-table-column>\
             <el-table-column prop="totalAmount" label="总金额" width="120"></el-table-column>\
             <el-table-column prop="createUserName" label="创建人" width="100"></el-table-column>\
-            <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>\
+            <el-table-column label="创建时间" width="160"><template #default="{row}">{{ $formatTime(row.createTime) }}</template></el-table-column>\
             <el-table-column label="操作" width="160" fixed="right">\
                 <template #default="{row}">\
                     <div class="table-actions">\
@@ -27,8 +28,9 @@ const SalesPage = {
                 </template>\
             </el-table-column>\
         </el-table>\
-        <div style="margin-top:15px;display:flex;justify-content:flex-end">\
-            <el-pagination background layout="total, prev, pager, next" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
+        <div class="pagination-bar">\
+            <span class="pagination-total">共 {{ page.totalCount }} 条记录</span>\
+            <el-pagination background layout="total, sizes, prev, pager, next" :page-sizes="[10,20,50]" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData" @size-change="onPageSizeChange"></el-pagination>\
         </div>\
     </div>',
     data: function() {
@@ -79,7 +81,7 @@ const SalesAddPage = {
         <el-form :model="form" ref="formRef" label-width="100px" style="max-width:700px">\
             <el-form-item label="订单明细">\
                 <el-button type="primary" size="small" @click="addItem">添加商品</el-button>\
-                <el-table :data="form.orderItems" border size="small" style="margin-top:10px">\
+                <el-table :data="form.orderItems" border size="small" style="margin-top:10px" empty-text="请添加商品">\
                     <el-table-column label="商品" min-width="180">\
                         <template #default="{row}">\
                             <el-select v-model="row.productId" size="small" style="width:100%" @change="onProductChange(row)">\
@@ -163,11 +165,11 @@ const SalesDetailPage = {
             <el-descriptions-item label="订单号">{{ order.orderNo }}</el-descriptions-item>\
             <el-descriptions-item label="总金额">¥{{ order.totalAmount }}</el-descriptions-item>\
             <el-descriptions-item label="创建人">{{ order.createUserName }}</el-descriptions-item>\
-            <el-descriptions-item label="创建时间">{{ order.createTime }}</el-descriptions-item>\
+            <el-descriptions-item label="创建时间">{{ $formatTime(order.createTime) }}</el-descriptions-item>\
         </el-descriptions>\
         <div class="order-items">\
             <h4>订单明细</h4>\
-            <el-table :data="order.orderItems || []" border>\
+            <el-table :data="order.orderItems || []" border empty-text="暂无明细">\
                 <el-table-column prop="productName" label="商品名称"></el-table-column>\
                 <el-table-column prop="price" label="单价" width="120"></el-table-column>\
                 <el-table-column prop="quantity" label="数量" width="100"></el-table-column>\

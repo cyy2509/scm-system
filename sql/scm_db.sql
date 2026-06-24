@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS sys_user;
 CREATE TABLE sys_user (
     user_id INT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
     username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
-    password VARCHAR(100) NOT NULL COMMENT '密码(MD5加密)',
+    password VARCHAR(200) NOT NULL COMMENT '密码(BCrypt加密)',
     real_name VARCHAR(50) NOT NULL COMMENT '真实姓名',
     role_id INT NOT NULL COMMENT '角色ID',
     phone VARCHAR(20) COMMENT '电话',
@@ -173,13 +173,13 @@ INSERT INTO sys_role(role_name, role_desc) VALUES
 ('物资部员工', '负责商品和库存管理'),
 ('人事部员工', '负责用户管理和新闻公告');
 
--- 用户数据（密码都是123456的MD5加密：e10adc3949ba59abbe56e057f20f883e）
+-- 用户数据（密码都是123456的BCrypt加密）
 INSERT INTO sys_user(username, password, real_name, role_id, phone, email) VALUES
-('admin', 'e10adc3949ba59abbe56e057f20f883e', '系统管理员', 1, '13800138000', 'admin@scm.com'),
-('caigou', 'e10adc3949ba59abbe56e057f20f883e', '张采购', 2, '13800138001', 'caigou@scm.com'),
-('xiaoshou', 'e10adc3949ba59abbe56e057f20f883e', '李销售', 3, '13800138002', 'xiaoshou@scm.com'),
-('wuzi', 'e10adc3949ba59abbe56e057f20f883e', '王物资', 4, '13800138003', 'wuzi@scm.com'),
-('renshi', 'e10adc3949ba59abbe56e057f20f883e', '赵人事', 5, '13800138004', 'renshi@scm.com');
+('admin', '$2a$10$udRR0A62oHSuKupY0lpiY.486bZp1e3xOEsc6haDG.4yP0QvakJcC', '系统管理员', 1, '13800138000', 'admin@scm.com'),
+('caigou', '$2a$10$udRR0A62oHSuKupY0lpiY.486bZp1e3xOEsc6haDG.4yP0QvakJcC', '张采购', 2, '13800138001', 'caigou@scm.com'),
+('xiaoshou', '$2a$10$udRR0A62oHSuKupY0lpiY.486bZp1e3xOEsc6haDG.4yP0QvakJcC', '李销售', 3, '13800138002', 'xiaoshou@scm.com'),
+('wuzi', '$2a$10$udRR0A62oHSuKupY0lpiY.486bZp1e3xOEsc6haDG.4yP0QvakJcC', '王物资', 4, '13800138003', 'wuzi@scm.com'),
+('renshi', '$2a$10$udRR0A62oHSuKupY0lpiY.486bZp1e3xOEsc6haDG.4yP0QvakJcC', '赵人事', 5, '13800138004', 'renshi@scm.com');
 
 -- 供应商数据
 INSERT INTO supplier(supplier_name, contact, phone, address, remark) VALUES

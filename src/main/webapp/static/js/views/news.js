@@ -9,14 +9,15 @@ const NewsPage = {
             <el-button type="primary" @click="showAdd">发布公告</el-button>\
         </div>\
         <div class="search-bar">\
-            <el-input v-model="query.keyword" placeholder="搜索标题/内容" clearable style="width:250px" @clear="loadData" @keyup.enter="loadData"></el-input>\
+            <el-input v-model="query.keyword" placeholder="搜索标题/内容" clearable style="width:200px" @clear="loadData" @keyup.enter="loadData"></el-input>\
             <el-button type="primary" @click="loadData">搜索</el-button>\
+            <el-button @click="resetQuery">重置</el-button>\
         </div>\
-        <el-table :data="page.list" v-loading="loading" border stripe>\
+        <el-table :data="page.list" v-loading="loading" border stripe empty-text="暂无数据">\
             <el-table-column prop="newsId" label="ID" width="60"></el-table-column>\
             <el-table-column prop="title" label="标题"></el-table-column>\
             <el-table-column prop="author" label="作者" width="100"></el-table-column>\
-            <el-table-column prop="createTime" label="发布时间" width="160"></el-table-column>\
+            <el-table-column label="发布时间" width="160"><template #default="{row}">{{ $formatTime(row.createTime) }}</template></el-table-column>\
             <el-table-column label="操作" width="200" fixed="right">\
                 <template #default="{row}">\
                     <div class="table-actions">\
@@ -27,14 +28,15 @@ const NewsPage = {
                 </template>\
             </el-table-column>\
         </el-table>\
-        <div style="margin-top:15px;display:flex;justify-content:flex-end">\
-            <el-pagination background layout="total, prev, pager, next" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
+        <div class="pagination-bar">\
+            <span class="pagination-total">共 {{ page.totalCount }} 条记录</span>\
+            <el-pagination background layout="total, sizes, prev, pager, next" :page-sizes="[10,20,50]" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData" @size-change="onPageSizeChange"></el-pagination>\
         </div>\
         <!-- 详情弹窗 -->\
         <el-dialog v-model="detailVisible" title="新闻详情" width="600px">\
-            <h3 style="margin-bottom:10px">{{ detail.title }}</h3>\
-            <div style="color:#909399;font-size:12px;margin-bottom:15px">{{ detail.author }} · {{ detail.createTime }}</div>\
-            <div style="line-height:1.8;white-space:pre-wrap">{{ detail.content }}</div>\
+            <h3 class="news-title" style="margin-bottom:6px;font-size:18px">{{ detail.title }}</h3>\
+            <div class="news-meta">{{ detail.author }} · {{ $formatTime(detail.createTime) }}</div>\
+            <div class="news-content">{{ detail.content }}</div>\
         </el-dialog>\
         <!-- 新增/编辑弹窗 -->\
         <el-dialog v-model="dialogVisible" :title="isEdit?\'编辑公告\':\'发布公告\'" width="600px">\
@@ -63,6 +65,15 @@ const NewsPage = {
     },
     created: function() { this.loadData(); },
     methods: {
+        resetQuery: function() {
+            this.query = { pageNo: 1, pageSize: this.query.pageSize, keyword: '' };
+            this.loadData();
+        },
+        onPageSizeChange: function(size) {
+            this.query.pageSize = size;
+            this.query.pageNo = 1;
+            this.loadData();
+        },
         loadData: function() {
             var self = this;
             self.loading = true;

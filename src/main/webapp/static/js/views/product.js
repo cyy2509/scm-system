@@ -9,17 +9,23 @@ const ProductPage = {
             <el-button type="primary" @click="showAdd">新增商品</el-button>\
         </div>\
         <div class="search-bar">\
-            <el-input v-model="query.keyword" placeholder="搜索商品名称" clearable style="width:180px" @clear="loadData" @keyup.enter="loadData"></el-input>\
-            <el-select v-model="query.categoryId" placeholder="选择分类" clearable style="width:140px" @change="loadData">\
+            <el-input v-model="query.keyword" placeholder="搜索商品名称" clearable style="width:200px" @clear="loadData" @keyup.enter="loadData"></el-input>\
+            <el-select v-model="query.categoryId" placeholder="选择分类" clearable style="width:160px" @change="loadData">\
                 <el-option v-for="c in categories" :key="c.categoryId" :label="c.categoryName" :value="c.categoryId"></el-option>\
             </el-select>\
             <el-button type="primary" @click="loadData">搜索</el-button>\
+            <el-button @click="resetQuery">重置</el-button>\
         </div>\
-        <el-table :data="page.list" v-loading="loading" border stripe>\
+        <el-table :data="page.list" v-loading="loading" border stripe empty-text="暂无数据">\
             <el-table-column prop="productId" label="ID" width="60"></el-table-column>\
             <el-table-column label="图片" width="80">\
                 <template #default="{row}">\
-                    <el-image v-if="row.imageUrl" :src="row.imageUrl" style="width:40px;height:40px;border-radius:4px" fit="cover"></el-image>\
+                    <el-image v-if="row.imageUrl" :src="row.imageUrl" style="width:40px;height:40px;border-radius:6px" fit="cover" lazy>\
+                        <template #error>\
+                            <div style="width:40px;height:40px;background:#f5f7fa;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#c0c4cc;font-size:18px">📦</div>\
+                        </template>\
+                    </el-image>\
+                    <div v-else style="width:40px;height:40px;background:var(--color-surface-secondary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--color-ink-subtle);font-size:18px">📦</div>\
                 </template>\
             </el-table-column>\
             <el-table-column prop="productName" label="商品名称"></el-table-column>\
@@ -39,8 +45,9 @@ const ProductPage = {
                 </template>\
             </el-table-column>\
         </el-table>\
-        <div style="margin-top:15px;display:flex;justify-content:flex-end">\
-            <el-pagination background layout="total, prev, pager, next" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData"></el-pagination>\
+        <div class="pagination-bar">\
+            <span class="pagination-total">共 {{ page.totalCount }} 条记录</span>\
+            <el-pagination background layout="total, sizes, prev, pager, next" :page-sizes="[10,20,50]" :total="page.totalCount" :page-size="query.pageSize" v-model:current-page="query.pageNo" @current-change="loadData" @size-change="onPageSizeChange"></el-pagination>\
         </div>\
         <el-dialog v-model="dialogVisible" :title="isEdit?\'编辑商品\':\'新增商品\'" width="500px">\
             <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">\
@@ -80,6 +87,15 @@ const ProductPage = {
     },
     created: function() { this.loadCategories(); this.loadData(); },
     methods: {
+        resetQuery: function() {
+            this.query = { pageNo: 1, pageSize: this.query.pageSize, keyword: '', categoryId: null };
+            this.loadData();
+        },
+        onPageSizeChange: function(size) {
+            this.query.pageSize = size;
+            this.query.pageNo = 1;
+            this.loadData();
+        },
         loadCategories: function() {
             var self = this;
             api.getCategories().then(function(res) { if (res.code === 200) self.categories = res.data; });

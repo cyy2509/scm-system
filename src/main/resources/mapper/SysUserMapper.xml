@@ -17,6 +17,13 @@
         <result property="roleName" column="role_name"/>
     </resultMap>
 
+    <select id="findByUsername" resultMap="userResultMap">
+        SELECT u.*, r.role_name
+        FROM sys_user u
+        LEFT JOIN sys_role r ON u.role_id = r.role_id
+        WHERE u.username = #{username} AND u.status = 1
+    </select>
+
     <select id="findByUsernameAndPassword" resultMap="userResultMap">
         SELECT u.*, r.role_name
         FROM sys_user u
@@ -95,4 +102,8 @@
     <update id="updatePassword">
         UPDATE sys_user SET password = #{password} WHERE user_id = #{userId}
     </update>
+
+    <select id="countByRoleId" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE role_id = #{roleId}
+    </select>
 </mapper>

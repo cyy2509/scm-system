@@ -10,7 +10,12 @@ import java.util.List;
 public interface SysUserMapper {
 
     /**
-     * 根据用户名和密码查询用户（登录验证）
+     * 根据用户名查询用户（登录用）
+     */
+    SysUser findByUsername(@Param("username") String username);
+
+    /**
+     * 根据用户名和密码查询用户（已弃用，改用BCrypt）
      */
     SysUser findByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
 
@@ -56,4 +61,9 @@ public interface SysUserMapper {
      * 修改密码
      */
     int updatePassword(@Param("userId") Integer userId, @Param("password") String password);
+
+    /**
+     * 统计某角色下的用户数（删除角色前检查）
+     */
+    int countByRoleId(@Param("roleId") Integer roleId);
 }

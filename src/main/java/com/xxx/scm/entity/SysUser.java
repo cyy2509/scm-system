@@ -1,5 +1,9 @@
 package com.xxx.scm.entity;
 
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,12 +14,27 @@ public class SysUser implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer userId;
+
+    @NotBlank(message = "用户名不能为空")
+    @Length(max = 50, message = "用户名最长50个字符")
     private String username;
+
+    @NotBlank(message = "密码不能为空")
+    @Length(min = 6, max = 100, message = "密码长度6-100位")
     private String password;
+
+    @NotBlank(message = "姓名不能为空")
     private String realName;
+
+    @NotNull(message = "角色不能为空")
     private Integer roleId;
+
+    @Length(max = 20, message = "电话最长20个字符")
     private String phone;
+
+    @Length(max = 50, message = "邮箱最长50个字符")
     private String email;
+
     private Integer status;  // 1-启用 0-禁用
     private Date createTime;
     private Date updateTime;
