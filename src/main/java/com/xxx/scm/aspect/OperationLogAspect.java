@@ -1,7 +1,6 @@
 package com.xxx.scm.aspect;
 
 import com.xxx.scm.entity.SysOperationLog;
-import com.xxx.scm.entity.SysUser;
 import com.xxx.scm.mapper.SysOperationLogMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -27,12 +26,12 @@ public class OperationLogAspect {
     private HttpServletRequest request;
 
     // 切入点：Controller层中add/save/delete/update方法
-    @Pointcut("execution(* com.xxx.scm.controller.*.*(..)) && " +
-              "(execution(* com.xxx.scm.controller.*.add*(..)) || " +
-              "execution(* com.xxx.scm.controller.*.save*(..)) || " +
-              "execution(* com.xxx.scm.controller.*.delete*(..)) || " +
-              "execution(* com.xxx.scm.controller.*.update*(..)) || " +
-              "execution(* com.xxx.scm.controller.*.edit*(..)))")
+    @Pointcut("execution(* com.cym.scm.controller.*.*(..)) && " +
+              "(execution(* com.cym.scm.controller.*.add*(..)) || " +
+              "execution(* com.cym.scm.controller.*.save*(..)) || " +
+              "execution(* com.cym.scm.controller.*.delete*(..)) || " +
+              "execution(* com.cym.scm.controller.*.update*(..)) || " +
+              "execution(* com.cym.scm.controller.*.edit*(..)))")
     public void operationPointcut() {}
 
     @AfterReturning(pointcut = "operationPointcut()", returning = "result")

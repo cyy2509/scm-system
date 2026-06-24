@@ -6,13 +6,10 @@ import com.xxx.scm.service.SysRoleService;
 import com.xxx.scm.service.SysUserService;
 import com.xxx.scm.util.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 用户 Controller — REST API

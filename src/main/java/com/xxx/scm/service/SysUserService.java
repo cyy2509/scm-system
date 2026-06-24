@@ -2,7 +2,6 @@ package com.xxx.scm.service;
 
 import com.xxx.scm.entity.SysUser;
 import com.xxx.scm.util.PageResult;
-import java.util.List;
 
 /**
  * 用户Service接口

@@ -162,9 +162,11 @@ const LoginPage = {
                 } else {
                     self.errorMsg = res.msg || '用户名或密码错误';
                 }
-            }).catch(function() {
+            }).catch(function(err) {
                 self.loading = false;
-                self.errorMsg = '网络错误，请稍后重试';
+                // 优先用error handler包装的msg，其次用响应里的msg
+                var errMsg = (err && err.msg) || (err && err.response && err.response.data && err.response.data.msg);
+                self.errorMsg = errMsg || '网络错误，请稍后重试';
             });
         }
     }

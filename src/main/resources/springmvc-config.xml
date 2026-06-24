@@ -12,7 +12,7 @@
            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- 扫描Controller层 -->
-    <context:component-scan base-package="com.xxx.scm.controller"/>
+    <context:component-scan base-package="com.xxx.scm.controller, com.xxx.scm.exception"/>
 
     <!-- 启用注解驱动，配置JSON消息转换器 -->
     <mvc:annotation-driven>
